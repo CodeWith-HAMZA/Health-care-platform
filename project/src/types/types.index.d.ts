@@ -6,6 +6,12 @@ declare type SearchParamProps = {
 };
 
 declare type Gender = "Male" | "Female" | "Other";
+
+// it doesn't have to be imported, it will be available globally without even importing
+declare interface ExampleType {
+  prop1: string;
+  prop2: number;
+}
 declare type Status = "pending" | "scheduled" | "cancelled";
 
 declare interface CreateUserParams {

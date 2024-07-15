@@ -1,5 +1,11 @@
 import { Models } from "node-appwrite";
 
+enum Gender {
+  Male = "male",
+  Female = "female",
+  Other = "other",
+}
+
 export interface Patient extends Models.Document {
   userId: string;
   name: string;
@@ -22,15 +28,4 @@ export interface Patient extends Models.Document {
   identificationNumber: string | undefined;
   identificationDocument: FormData | undefined;
   privacyConsent: boolean;
-}
-
-export interface Appointment extends Models.Document {
-  patient: Patient;
-  schedule: Date;
-  status: Status;
-  primaryPhysician: string;
-  reason: string;
-  note: string;
-  userId: string;
-  cancellationReason: string | null;
 }
