@@ -26,14 +26,14 @@ export default function PatientForm() {
 
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
     const { email, phone, username: name } = values;
-    
+    console.log('first')
     setLoading(true);
     try {
       const user = await createUser({ name, email, phone });
 
 
-      toast.success("Success!");
       if(user) router.push(`/patients/${user.$id}/register`)
+      toast.success("Success!");
       setLoading(false);
     } catch (error) {
 

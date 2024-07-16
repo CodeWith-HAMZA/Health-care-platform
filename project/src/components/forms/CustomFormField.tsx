@@ -1,4 +1,22 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { MultiSelect } from "react-multi-select-component";
+
+const options = [
+  { label: "Grapes 🍇", value: "grapes" },
+  { label: "Mango 🥭", value: "mango" },
+  { label: "Strawberry 🍓", value: "strawberry", disabled: true },
+];
+
 import "react-phone-number-input/style.css";
 
 import { Controller, Control } from "react-hook-form";
@@ -21,6 +39,17 @@ import {
   ENDPOINT,
   PATIENT_COLLECTION_ID,
 } from "@/appwrite.config";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
+import { CalendarIcon } from "lucide-react";
+import { formatDate } from "date-fns";
+import { Calendar } from "../ui/calendar";
+import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import FileInputUploader from "./FileInputUploader";
+import { Checkbox } from "../ui/checkbox";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -30,6 +59,10 @@ export enum FormFieldType {
   DATE_PICKER = "datePicker",
   SELECT = "select",
   SKELETON = "skeleton",
+  SINGLE_SELECT_DROPDOWN = "single-select-dropdown",
+  MULTI_SELECT = "multi-select",
+
+  FILE_INPUT = "file-input",
 }
 
 interface CustomFormFieldProps {
@@ -55,7 +88,9 @@ function RenderInput({
   iconAlt,
   iconSrc,
   formFieldType,
+  children,
 }: {
+  children?: ReactNode;
   placeholder: string;
   label: string;
   field: any;
@@ -63,7 +98,7 @@ function RenderInput({
   iconAlt: string;
   formFieldType: string;
 }) {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState([]);
 
   switch (formFieldType) {
     case FormFieldType.INPUT:
@@ -73,7 +108,48 @@ function RenderInput({
           <Input placeholder={placeholder} {...field} />
         </>
       );
+    case FormFieldType.FILE_INPUT:
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+          <FileInputUploader files={field.value} onChange={field?.onChange} />
+        </>
+      );
+    case FormFieldType.CHECKBOX:
+      return (
+        <div className="items-top flex space-x-2">
+          <Checkbox checked={field?.value} onChange={field?.onChange} />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="terms1"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {label}
+            </label>
+            {placeholder ? (
+              <p className="text-sm text-muted-foreground">{placeholder}</p>
+            ) : null}
+          </div>
+        </div>
+      );
 
+    case FormFieldType.SINGLE_SELECT_DROPDOWN:
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+          <Select onValueChange={field?.onChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {children}
+              </SelectGroup>
+            </SelectContent>
+          </Select>{" "}
+        </>
+      );
     case FormFieldType.PHONE_INPUT:
       return (
         <>
@@ -86,6 +162,77 @@ function RenderInput({
             className="input-phone"
             defaultCountry="PK"
           />
+        </>
+      );
+    case FormFieldType.DATE_PICKER:
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !field?.value && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {field?.value ? (
+                  formatDate(field?.value, "PPP")
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={field?.value}
+                onSelect={field?.onChange}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </>
+      );
+    case FormFieldType.MULTI_SELECT:
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+        </>
+      );
+    case FormFieldType.SELECT:
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+
+          <RadioGroup
+            onValueChange={field?.onChange}
+            defaultValue={field.value}
+            className="flex gap-2 py-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="male" id="r1" />
+              <Label htmlFor="r1">Male</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="female" id="r2" />
+              <Label htmlFor="r2">Female</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="other" id="r3" />
+              <Label htmlFor="r3">Other</Label>
+            </div>
+          </RadioGroup>
+        </>
+      );
+    case FormFieldType.TEXTAREA:
+      return (
+        <>
+          {" "}
+          <FormLabel>{label}</FormLabel>
+          <Textarea placeholder={placeholder} {...field} />
         </>
       );
     default:
@@ -102,6 +249,7 @@ const CustomFormField: React.FC<CustomFormFieldProps> = ({
   formFieldType,
   iconAlt,
   iconSrc,
+  children,
 }) => {
   // console.log(
   //   APPWRITE_PROJECT_ID,
@@ -126,6 +274,7 @@ const CustomFormField: React.FC<CustomFormFieldProps> = ({
               iconAlt={iconAlt || ""}
               iconSrc={iconSrc || ""}
               formFieldType={formFieldType}
+              children={children}
             />
           </FormControl>
           {/* <FormDescription>{description}</FormDescription> */}
