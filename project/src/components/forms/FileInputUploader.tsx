@@ -7,6 +7,8 @@ import { Button } from "../ui/button";
 import { UploadIcon } from "lucide-react";
 import Image from "next/image";
 import { convertFileToUrl } from "@/lib/utils";
+import { storage } from "@/appwrite.config";
+import { ID } from "node-appwrite";
 type FileUploaderProps = {
   files: File[];
   onChange: (files: File[]) => void;
@@ -15,10 +17,14 @@ export default function FileInputUploader({
   files,
   onChange,
 }: FileUploaderProps) {
-  const onDrop = useCallback((acceptedFiles: any) => {
-    console.log("first", acceptedFiles);
-    onChange(acceptedFiles);
+  const onDrop = useCallback(async (acceptedFiles: any) => {
+    // onChange(acceptedFiles);
+    console.log("first", acceptedFiles[0]);
     // Do something with the files
+    storage
+      .createFile("668f463c0025777bc532", ID.unique(), acceptedFiles[0])
+      .then((_) => console.log(_, "shaddu"))
+      .catch((s) => console.log(s, " err"));
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
@@ -44,9 +50,7 @@ export default function FileInputUploader({
               <div className="flex flex-col items-center justify-center space-y-3">
                 <div className="flex flex-col items-center justify-center w-full h-48  border-2 border-dashed border-primary rounded-lg transition-colors duration-300 hover:border-white group">
                   {files && files?.length > 0 ? (
-                    <>
-                       
-                    </>
+                    <></>
                   ) : (
                     <Image
                       src={"/assets/icons/upload.svg"}
@@ -71,9 +75,7 @@ export default function FileInputUploader({
               <div className="flex flex-col items-center justify-center space-y-3">
                 <div className="flex flex-col items-center justify-center w-full h-48  border-2 border-dashed border-primary rounded-lg transition-colors duration-300 hover:border-white group">
                   {files && files?.length > 0 ? (
-                    <>
-                      
-                    </>
+                    <></>
                   ) : (
                     <Image
                       src={"/assets/icons/upload.svg"}

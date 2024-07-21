@@ -118,7 +118,11 @@ function RenderInput({
     case FormFieldType.CHECKBOX:
       return (
         <div className="items-top flex space-x-2">
-          <Checkbox checked={field?.value} onChange={field?.onChange} />
+          <Checkbox
+          checked={field?.value}
+          onCheckedChange={field?.onChange}
+          //  onChange={field?.onChange}
+          />
           <div className="grid gap-1.5 leading-none">
             <label
               htmlFor="terms1"
@@ -213,15 +217,15 @@ function RenderInput({
             className="flex gap-2 py-2"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="male" id="r1" />
+              <RadioGroupItem value="Male" id="r1" />
               <Label htmlFor="r1">Male</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="female" id="r2" />
+              <RadioGroupItem value="Female" id="r2" />
               <Label htmlFor="r2">Female</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="other" id="r3" />
+              <RadioGroupItem value="Other" id="r3" />
               <Label htmlFor="r3">Other</Label>
             </div>
           </RadioGroup>

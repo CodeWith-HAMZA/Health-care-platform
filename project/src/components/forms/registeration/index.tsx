@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import {
-  PatientFormValidation,
-  PatientRegisterationFormValidation,
-} from "@/validations";
+import { PatientFormValidation } from "@/validations";
 import { createUser } from "@/lib/actions/patient.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -22,35 +19,83 @@ import {
   ArrowRightCircle,
   ArrowRightIcon,
 } from "lucide-react";
+import { PatientFormDefaultValues } from "@/constants/index";
+import { parseStringify } from "@/lib/utils";
+import {
+  APPWRITE_PROJECT_ID,
+  BUCKET_ID,
+  DATABASE_ID,
+  ENDPOINT,
+  PATIENT_COLLECTION_ID,
+  databases,
+  storage,
+} from "@/appwrite.config";
+import { ID } from "node-appwrite";
+import { InputFile } from "node-appwrite/file";
 
 export default function PatientForm({ user }: { user: User }) {
   const [loading, setLoading] = useState(false);
-  const form = useForm<z.infer<typeof PatientRegisterationFormValidation>>({
-    resolver: zodResolver(PatientRegisterationFormValidation),
+  const form = useForm<z.infer<typeof PatientFormValidation>>({
+    resolver: zodResolver(PatientFormValidation),
     defaultValues: {
-      username: "",
-      email: "",
-      phone: "",
-      birthDate: "",
-      gender: "other",
-      identificationType: "none",
+      ...PatientFormDefaultValues,
     },
   });
   const router = useRouter();
 
-  async function onSubmit(
-    values: z.infer<typeof PatientRegisterationFormValidation>
-  ) {
-    const { email, phone, username: name } = values;
+  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
+    const patientData = {
+      ...values,
+      userId: user?.$id,
+    };
+
+    // converting to blob
+    let formData;
+    if (
+      values.identificationDocument &&
+      values.identificationDocument?.length > 0
+    ) {
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      });
+      formData = new FormData();
+      formData.append("fileName", values.identificationDocument[0].name);
+      formData.append("blobFile", blobFile);
+    }
 
     setLoading(true);
     try {
-      const user = await createUser({ name, email, phone });
+      const p = await registerPatient(
+         ({
+          address: patientData.address,
+          allergies: patientData.allergies,
+          birthDate: patientData.birthDate,
+          currentMedication: patientData.currentMedication,
+          email: patientData.email,
+          emergencyContactName: patientData.emergencyContactName,
+          emergencyContactNumber: patientData.emergencyContactNumber,
+          familyMedicalHistory: patientData.familyMedicalHistory,
+          gender: patientData.gender,
+          identificationDocument: formData,
+          identificationNumber: patientData.identificationNumber,
+          identificationType: patientData.identificationType,
+          insurancePolicyNumber: patientData.insurancePolicyNumber,
+          insuranceProvider: patientData.insuranceProvider,
+          name: patientData.name,
+          occupation: patientData.occupation,
+          pastMedicalHistory: patientData.pastMedicalHistory,
+          phone: patientData.phone,
+          privacyConsent: patientData.privacyConsent,
+          userId: patientData.userId,
+        })
+      );
+      console.log(p);
 
-      toast.success("Success!");
-      if (user) router.push(`/patients/${user.$id}/register`);
+      toast.success("Successfully Regitered!");
+      // if (user) router.push(`/patients/${user.$id}/register`);
       setLoading(false);
     } catch (error) {
+      console.log(error, " error");
       toast.error("Error! while proceeding it");
 
       setLoading(false);
@@ -71,7 +116,7 @@ export default function PatientForm({ user }: { user: User }) {
                 formFieldType={FormFieldType.INPUT}
                 control={form.control}
                 label="User Name"
-                name="username"
+                name="name"
                 placeholder="Enter Your Name"
               />
 
@@ -165,7 +210,7 @@ export default function PatientForm({ user }: { user: User }) {
                 formFieldType={FormFieldType.TEXTAREA}
                 control={form.control}
                 label="Current Medication (if any)"
-                name="birthDate"
+                name="currentMedication"
                 placeholder="S-gliptin-50/500 mg, Nebicare 5mg"
               />
               <CustomFormField
@@ -173,6 +218,13 @@ export default function PatientForm({ user }: { user: User }) {
                 control={form.control}
                 label="Past Medical History"
                 name="pastMedicalHistory"
+                placeholder="Appendectomy, Tonsillectomy"
+              />
+              <CustomFormField
+                formFieldType={FormFieldType.TEXTAREA}
+                control={form.control}
+                label="Family Medical History"
+                name="familyMedicalHistory"
                 placeholder="Appendectomy, Tonsillectomy"
               />
             </div>
@@ -225,14 +277,14 @@ export default function PatientForm({ user }: { user: User }) {
                 label="I Consent Treatement"
                 name="treatmentConsent"
                 placeholder="You agree to our Terms of Service and Treatement."
-                />
+              />
               <CustomFormField
                 formFieldType={FormFieldType.CHECKBOX}
                 control={form.control}
                 label="I Consent To Disclosure of Information"
                 name="disclosureConsent"
                 placeholder="You agree to our Terms of Service and Disclosure."
-                />
+              />
               <CustomFormField
                 formFieldType={FormFieldType.CHECKBOX}
                 control={form.control}
@@ -247,4 +299,40 @@ export default function PatientForm({ user }: { user: User }) {
       </form>
     </Form>
   );
+}
+
+// REGISTER PATIENT
+export async function registerPatient({
+  identificationDocument,
+  ...patient
+}: RegisterUserParams) {
+  try {
+    // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
+    let file;
+    if (identificationDocument) {
+      // const inputFile =
+      //   identificationDocument &&
+      //   InputFile.fromBuffer(
+      //     identificationDocument?.get("blobFile") as Blob,
+      //     identificationDocument?.get("fileName") as string
+      //   );
+      // file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+    }
+
+    // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
+    const newPatient = await databases.createDocument(
+      DATABASE_ID!,
+      PATIENT_COLLECTION_ID!,
+      ID.unique(),
+      {
+        identificationDocumentId: "file?.$id" ? "file.$" : null,
+        identificationDocumentUrl: "https://shaddu.com",
+        ...patient,
+      }
+    );
+
+    return parseStringify(newPatient);
+  } catch (error) {
+    console.error("An error occurred while creating a new patient:", error);
+  }
 }

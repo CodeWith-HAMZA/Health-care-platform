@@ -5,8 +5,7 @@ import Link from "next/link";
 import React from "react";
 
 async function RegisterPage({ params: { userId } }: SearchParamProps) {
-  const user = await getUser(userId);
-  console.log(user);
+  const { $id, name, email, phone } = await getUser(userId);
 
   return (
     <>
@@ -22,11 +21,10 @@ async function RegisterPage({ params: { userId } }: SearchParamProps) {
             />
             <Registeration
               user={{
-                name: "",
-                email: "",
-                phone: "",
-                
-                $id: "",
+                name,
+                email,
+                phone,
+                $id,
               }}
             />
             {/* <PatientForm /> */}

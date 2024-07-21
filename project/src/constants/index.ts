@@ -11,7 +11,7 @@ export const PatientFormDefaultValues = {
   occupation: "",
   emergencyContactName: "",
   emergencyContactNumber: "",
-  primaryPhysician: "",
+  // primaryPhysician: "",
   insuranceProvider: "",
   insurancePolicyNumber: "",
   allergies: "",

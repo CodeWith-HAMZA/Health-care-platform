@@ -7,36 +7,34 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { PatientFormValidation } from "@/validations";
+import { UserFormValidation } from "@/validations";
 import { createUser } from "@/lib/actions/patient.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function PatientForm() {
   const [loading, setLoading] = useState(false);
-  const form = useForm<z.infer<typeof PatientFormValidation>>({
-    resolver: zodResolver(PatientFormValidation),
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
       phone: "",
     },
   });
-  const router = useRouter()
+  const router = useRouter();
 
-  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
-    const { email, phone, username: name } = values;
-    console.log('first')
+  async function onSubmit(values: z.infer<typeof UserFormValidation>) {
+    const { email, phone, name } = values;
+    console.log("first");
     setLoading(true);
     try {
       const user = await createUser({ name, email, phone });
 
-
-      if(user) router.push(`/patients/${user.$id}/register`)
+      if (user) router.push(`/patients/${user.$id}/register`);
       toast.success("Success!");
       setLoading(false);
     } catch (error) {
-
       toast.error("Error! while proceeding it");
 
       setLoading(false);
@@ -54,7 +52,7 @@ export default function PatientForm() {
           formFieldType={FormFieldType.INPUT}
           control={form.control}
           label="User Name"
-          name="username"
+          name="name"
           placeholder="Enter Your Name"
         />
         <CustomFormField
