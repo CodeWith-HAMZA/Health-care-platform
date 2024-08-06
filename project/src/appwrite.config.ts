@@ -18,6 +18,7 @@ export const DOCTOR_COLLECTION_ID = "668f45c3001b1d2fcb0c";
 export const ENDPOINT = "https://cloud.appwrite.io/v1";
 export const APPOINTMENT_COLLECTION_ID = "668f45f200228db71af2";
 export const BUCKET_ID = "668f463c0025777bc532";
+export const ADMIN_PASSKEY = "424242";
 
 const client = new sdk.Client();
 client
@@ -29,3 +30,10 @@ export const databases = new sdk.Databases(client);
 export const storage = new sdk.Storage(client);
 export const messaging = new sdk.Messaging(client);
 export const users = new sdk.Users(client);
+export const account = new sdk.Account(client);
+
+// secret for encrypiton and dycription
+export const CRYPTO_secretKey = "your-secret-key";
+
+// local-storage-vars
+export const LS_userId = "__u__";

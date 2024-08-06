@@ -53,6 +53,7 @@ import { Checkbox } from "../ui/checkbox";
 
 export enum FormFieldType {
   INPUT = "input",
+  PASSWORD_INPUT = "password",
   TEXTAREA = "textarea",
   PHONE_INPUT = "phoneInput",
   CHECKBOX = "checkbox",
@@ -71,6 +72,7 @@ interface CustomFormFieldProps {
   name: string;
   label: string;
   placeholder?: string;
+  contentEditable?: boolean;
   description?: string;
   iconAlt?: string;
   iconSrc?: string;
@@ -89,6 +91,7 @@ function RenderInput({
   iconSrc,
   formFieldType,
   children,
+  contentEditable,
 }: {
   children?: ReactNode;
   placeholder: string;
@@ -97,15 +100,46 @@ function RenderInput({
   iconSrc: string;
   iconAlt: string;
   formFieldType: string;
+  contentEditable?: boolean;
 }) {
   const [value, setValue] = useState([]);
 
+  let isEditable;
+
   switch (formFieldType) {
     case FormFieldType.INPUT:
+      if (contentEditable === undefined || contentEditable === true) {
+        isEditable = true;
+      } else if (contentEditable === false) {
+        isEditable = false;
+      }
       return (
         <>
           <FormLabel>{label}</FormLabel>
-          <Input placeholder={placeholder} {...field} />
+          <Input
+            contentEditable={isEditable}
+            value={field.value}
+            placeholder={placeholder}
+            {...(isEditable ? field : undefined)}
+          />
+        </>
+      );
+    case FormFieldType.PASSWORD_INPUT:
+      if (contentEditable === undefined || contentEditable === true) {
+        isEditable = true;
+      } else if (contentEditable === false) {
+        isEditable = false;
+      }
+      return (
+        <>
+          <FormLabel>{label}</FormLabel>
+          <Input
+            type="password"
+            contentEditable={isEditable}
+            value={field.value}
+            placeholder={placeholder}
+            {...(isEditable ? field : undefined)}
+          />
         </>
       );
     case FormFieldType.FILE_INPUT:
@@ -119,9 +153,9 @@ function RenderInput({
       return (
         <div className="items-top flex space-x-2">
           <Checkbox
-          checked={field?.value}
-          onCheckedChange={field?.onChange}
-          //  onChange={field?.onChange}
+            checked={field?.value}
+            onCheckedChange={field?.onChange}
+            //  onChange={field?.onChange}
           />
           <div className="grid gap-1.5 leading-none">
             <label
@@ -155,11 +189,17 @@ function RenderInput({
         </>
       );
     case FormFieldType.PHONE_INPUT:
+      if (contentEditable === undefined || contentEditable === true) {
+        isEditable = true;
+      } else if (contentEditable === false) {
+        isEditable = false;
+      }
       return (
         <>
           <FormLabel>{label}</FormLabel>
 
           <PhoneInput
+            disabled={!isEditable}
             international
             value={field?.value as string | undefined}
             onChange={field?.onChange}
@@ -239,8 +279,6 @@ function RenderInput({
           <Textarea placeholder={placeholder} {...field} />
         </>
       );
-    default:
-      break;
   }
 }
 
@@ -254,6 +292,7 @@ const CustomFormField: React.FC<CustomFormFieldProps> = ({
   iconAlt,
   iconSrc,
   children,
+  contentEditable,
 }) => {
   // console.log(
   //   APPWRITE_PROJECT_ID,
@@ -279,10 +318,11 @@ const CustomFormField: React.FC<CustomFormFieldProps> = ({
               iconSrc={iconSrc || ""}
               formFieldType={formFieldType}
               children={children}
+              contentEditable={contentEditable}
             />
           </FormControl>
           {/* <FormDescription>{description}</FormDescription> */}
-          <FormMessage />
+          <FormMessage style={{ color: "#a42c2c" }} />
         </FormItem>
       )}
     />

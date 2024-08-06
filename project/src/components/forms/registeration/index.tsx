@@ -33,12 +33,15 @@ import {
 import { ID } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 
-export default function PatientForm({ user }: { user: User }) {
+export default function RegisterationForm({ user }: { user: User }) {
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
     },
   });
   const router = useRouter();
@@ -50,50 +53,48 @@ export default function PatientForm({ user }: { user: User }) {
     };
 
     // converting to blob
-    let formData;
-    if (
-      values.identificationDocument &&
-      values.identificationDocument?.length > 0
-    ) {
-      const blobFile = new Blob([values.identificationDocument[0]], {
-        type: values.identificationDocument[0].type,
-      });
-      formData = new FormData();
-      formData.append("fileName", values.identificationDocument[0].name);
-      formData.append("blobFile", blobFile);
-    }
+    // let formData;
+    // if (
+    //   values.identificationDocument &&
+    //   values.identificationDocument?.length > 0
+    // ) {
+    //   const blobFile = new Blob([values.identificationDocument[0]], {
+    //     type: values.identificationDocument[0].type,
+    //   });
+    //   formData = new FormData();
+    //   formData.append("fileName", values.identificationDocument[0].name);
+    //   formData.append("blobFile", blobFile);
+    // }
 
     setLoading(true);
     try {
-      const p = await registerPatient(
-         ({
-          address: patientData.address,
-          allergies: patientData.allergies,
-          birthDate: patientData.birthDate,
-          currentMedication: patientData.currentMedication,
-          email: patientData.email,
-          emergencyContactName: patientData.emergencyContactName,
-          emergencyContactNumber: patientData.emergencyContactNumber,
-          familyMedicalHistory: patientData.familyMedicalHistory,
-          gender: patientData.gender,
-          identificationDocument: formData,
-          identificationNumber: patientData.identificationNumber,
-          identificationType: patientData.identificationType,
-          insurancePolicyNumber: patientData.insurancePolicyNumber,
-          insuranceProvider: patientData.insuranceProvider,
-          name: patientData.name,
-          occupation: patientData.occupation,
-          pastMedicalHistory: patientData.pastMedicalHistory,
-          phone: patientData.phone,
-          privacyConsent: patientData.privacyConsent,
-          userId: patientData.userId,
-        })
-      );
-      console.log(p);
+      const p = await registerPatient({
+        address: patientData.address,
+        allergies: patientData.allergies,
+        birthDate: patientData.birthDate,
+        currentMedication: patientData.currentMedication,
+        email: patientData.email,
+        emergencyContactName: patientData.emergencyContactName,
+        emergencyContactNumber: patientData.emergencyContactNumber,
+        familyMedicalHistory: patientData.familyMedicalHistory,
+        gender: patientData.gender,
+        identificationDocument: values.identificationDocument,
+        identificationNumber: patientData.identificationNumber,
+        identificationType: patientData.identificationType,
+        insurancePolicyNumber: patientData.insurancePolicyNumber,
+        insuranceProvider: patientData.insuranceProvider,
+        name: patientData.name,
+        occupation: patientData.occupation,
+        pastMedicalHistory: patientData.pastMedicalHistory,
+        phone: patientData.phone,
+        privacyConsent: patientData.privacyConsent,
+        userId: patientData.userId,
+      });
+      console.log(p, patientData, " patient data");
 
       toast.success("Successfully Regitered!");
-      // if (user) router.push(`/patients/${user.$id}/register`);
       setLoading(false);
+      if (user) router.push(`/patients/${user.$id}/new-appointment`);
     } catch (error) {
       console.log(error, " error");
       toast.error("Error! while proceeding it");
@@ -117,10 +118,12 @@ export default function PatientForm({ user }: { user: User }) {
                 control={form.control}
                 label="User Name"
                 name="name"
+                contentEditable={false}
                 placeholder="Enter Your Name"
               />
 
               <CustomFormField
+                contentEditable={false}
                 formFieldType={FormFieldType.INPUT}
                 control={form.control}
                 label="Email"
@@ -131,6 +134,7 @@ export default function PatientForm({ user }: { user: User }) {
                 formFieldType={FormFieldType.PHONE_INPUT}
                 control={form.control}
                 label="Phone"
+                contentEditable={false}
                 name="phone"
                 placeholder="(555) 123-4567"
               />
@@ -242,7 +246,6 @@ export default function PatientForm({ user }: { user: User }) {
                 name="identificationType"
                 placeholder=" Select Identification Type"
               >
-                <SelectItem value="none">None</SelectItem>
                 {IdentificationTypes.map((_) => {
                   return (
                     <>
@@ -301,7 +304,6 @@ export default function PatientForm({ user }: { user: User }) {
   );
 }
 
-// REGISTER PATIENT
 export async function registerPatient({
   identificationDocument,
   ...patient
@@ -317,16 +319,23 @@ export async function registerPatient({
       //     identificationDocument?.get("fileName") as string
       //   );
       // file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+      file = await storage.createFile(
+        BUCKET_ID,
+        ID.unique(),
+        identificationDocument[0]
+      );
     }
 
     // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
+    const fileUrl = `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file?.$id}/view??project=${APPWRITE_PROJECT_ID}`;
+
     const newPatient = await databases.createDocument(
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        identificationDocumentId: "file?.$id" ? "file.$" : null,
-        identificationDocumentUrl: "https://shaddu.com",
+        identificationDocument: file?.$id ? file?.$id : null,
+        identificationDocumentUrl: file?.$id ? fileUrl : null,
         ...patient,
       }
     );

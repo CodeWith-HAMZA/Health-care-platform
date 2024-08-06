@@ -1,15 +1,23 @@
 import { z } from "zod";
 
-export const UserFormValidation = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be at most 50 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z
-    .string()
-    .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
-});
+export const UserFormValidation = z
+  .object({
+    name: z
+      .string()
+      .min(8, "Name must be at least 2 characters")
+      .max(50, "Name must be at most 50 characters"),
+    email: z.string().email("Invalid email address"),
+    phone: z
+      .string()
+      .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+
+    password: z.string(),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const PatientFormValidation = z.object({
   name: z
@@ -25,7 +33,7 @@ export const PatientFormValidation = z.object({
   address: z
     .string()
     .min(5, "Address must be at least 5 characters")
-    .max(500, "Address must be at most 500 characters"),
+    .max(100, "Address must be at most 500 characters"),
   occupation: z
     .string()
     .min(2, "Occupation must be at least 2 characters")
@@ -96,13 +104,14 @@ export const ScheduleAppointmentSchema = z.object({
 });
 
 export const CancelAppointmentSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
-  schedule: z.coerce.date(),
+  primaryPhysician: z.string().optional(),
+  schedule: z.coerce.date().optional(),
   reason: z.string().optional(),
   note: z.string().optional(),
+
   cancellationReason: z
     .string()
-    .min(2, "Reason must be at least 2 characters")
+    .min(6, "Reason must be at least 6 characters")
     .max(500, "Reason must be at most 500 characters"),
 });
 

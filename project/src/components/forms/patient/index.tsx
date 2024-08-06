@@ -11,6 +11,8 @@ import { UserFormValidation } from "@/validations";
 import { createUser } from "@/lib/actions/patient.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { LS_userId, account, users } from "@/appwrite.config";
+import { OAuthProvider } from "node-appwrite";
 
 export default function PatientForm() {
   const [loading, setLoading] = useState(false);
@@ -20,19 +22,27 @@ export default function PatientForm() {
       name: "",
       email: "",
       phone: "",
+      password: "",
+      confirmPassword: "",
     },
   });
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof UserFormValidation>) {
-    const { email, phone, name } = values;
+    const { email, phone, name, password } = values;
+
     console.log("first");
     setLoading(true);
     try {
-      const user = await createUser({ name, email, phone });
+      const user = await createUser({ name, email, phone, password });
+      console.log(user, "user ");
+      if (user) {
+        localStorage.setItem(LS_userId, user?.$id);
 
-      if (user) router.push(`/patients/${user.$id}/register`);
-      toast.success("Success!");
+        // router.push(`/patients/${user.$id}/register`);
+
+        toast.success("Success!");
+      }
       setLoading(false);
     } catch (error) {
       toast.error("Error! while proceeding it");
@@ -45,7 +55,15 @@ export default function PatientForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1">
         <section className="mb-12 space-y-4">
-          <h1 className="header">Welcome Here!</h1>
+          <h1
+            onClick={async () => {
+              const user = await users.get("66afbec00022c2b275d4");
+              console.log(user);
+            }}
+            className="header"
+          >
+            Welcome Here!
+          </h1>
           <p className="text-dark-700">Schedule Your First Appointment</p>
         </section>
         <CustomFormField
@@ -68,6 +86,20 @@ export default function PatientForm() {
           label="Phone"
           name="phone"
           placeholder="(555) 123-4567"
+        />
+        <CustomFormField
+          formFieldType={FormFieldType.PASSWORD_INPUT}
+          control={form.control}
+          label="Password"
+          name="password"
+          placeholder="Enter Your Password"
+        />
+        <CustomFormField
+          formFieldType={FormFieldType.PASSWORD_INPUT}
+          control={form.control}
+          label="Confirm Password"
+          name="confirmPassword"
+          placeholder="Confirm Your  Password"
         />
 
         <SubmitButton isLoading={loading}>Get Started</SubmitButton>

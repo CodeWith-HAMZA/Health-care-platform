@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+// Create-Prefix means For Forms
 
 declare type SearchParamProps = {
   params: { [key: string]: string };
@@ -46,16 +47,18 @@ declare interface RegisterUserParams extends CreateUserParams {
 declare type CreateAppointmentParams = {
   userId: string;
   patient: string;
-  primaryPhysician: string;
+  primaryPhysician?: string;
   reason: string;
   schedule: Date;
   status: Status;
   note: string | undefined;
+  doctor?: string;
 };
 
 declare type UpdateAppointmentParams = {
   appointmentId: string;
   userId: string;
-  appointment: Appointment;
-  type: string;
+  appointment?: Appointment;
+  status: string;
+  
 };

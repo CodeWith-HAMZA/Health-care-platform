@@ -275,6 +275,15 @@
   .date-picker {
     @apply overflow-hidden border-transparent w-full placeholder:text-dark-600  h-11 text-14-medium rounded-md px-3 outline-none !important;
   }
+  .bg-appointments {
+    @apply bg-cyan-500/30 hover:opacity-90 transition-all;
+  }
+  .bg-cancelled {
+    @apply bg-red-700/20 hover:opacity-90 transition-all;
+  }
+  .bg-pending {
+    @apply bg-gray-500/30 hover:opacity-90 transition-all;
+  }
 }
 
 /* =====  REACT-DATEPICKER OVERRIDES */

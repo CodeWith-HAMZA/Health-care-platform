@@ -22,6 +22,11 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
+      backgroundImage: {
+        'appointments-stat': "url('/assets/images/appointments-bg.png')",
+        'pending-stat': "url('/assets/images/pending-bg.png')",
+        'cancelled-stat': "url('/assets/images/cancelled-bg.png')",
+      },
 
       // defined custom colors, and their shades
       colors: {

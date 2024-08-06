@@ -1,4 +1,7 @@
+import { CRYPTO_secretKey } from "@/appwrite.config";
 import { type ClassValue, clsx } from "clsx";
+import CryptoJS from "crypto-js";
+
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -75,3 +78,18 @@ export function encryptKey(passkey: string) {
 export function decryptKey(passkey: string) {
   return atob(passkey);
 }
+
+export const encryptObject = (obj) => {
+  const jsonString = JSON.stringify(obj);
+  const encrypted = CryptoJS.AES.encrypt(
+    jsonString,
+    CRYPTO_secretKey
+  ).toString();
+  return encrypted;
+};
+
+export const decryptObject = (encrypted) => {
+  const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
+  const jsonString = bytes.toString(CryptoJS.enc.Utf8);
+  return JSON.parse(jsonString);
+};
