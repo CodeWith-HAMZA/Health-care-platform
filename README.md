@@ -1,6 +1,4 @@
-# TheProduct
-
-**TheProduct** is a full-stack platform that allows doctors to create profiles, manage appointments, and communicate with patients. Patients can easily book appointments with their preferred doctors, who can then review, schedule, or cancel these appointments.
+**Health Care** is a full-stack platform that allows doctors to create profiles, manage appointments, and communicate with patients. Patients can easily book appointments with their preferred doctors, who can then review, schedule, or cancel these appointments.
 
 ## Features
 
