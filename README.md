@@ -15,6 +15,8 @@
 - **Server Actions**: Latest feature in Next.js for server-side business logic.
 - **Full-Stack**: Both frontend and backend managed within the same framework.
 
+Currently in Process
+
 ## Getting Started
 
 ### Prerequisites
