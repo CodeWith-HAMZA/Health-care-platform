@@ -28,7 +28,7 @@ export default function Home({ searchParams }: SearchParamProps) {
             height={100}
           />
           <PatientForm />
-          <Button
+          {/* <Button
             variant={"ghost"}
             onClick={async () => {
               // const res = await account.createEmailToken(
@@ -45,7 +45,7 @@ export default function Home({ searchParams }: SearchParamProps) {
             className="w-full"
           >
             Sign With Google
-          </Button>
+          </Button> */}
 
           <div className="text-14-regular">
             {/* <p className="justify-items-end text-dark-600 xl:text-left">

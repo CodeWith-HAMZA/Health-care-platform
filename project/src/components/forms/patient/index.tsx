@@ -57,8 +57,8 @@ export default function PatientForm() {
         <section className="mb-12 space-y-4">
           <h1
             onClick={async () => {
-              const user = await users.get("66afbec00022c2b275d4");
-              console.log(user);
+              // const user = await users.get("66afbec00022c2b275d4");
+              // console.log(user);
             }}
             className="header"
           >
