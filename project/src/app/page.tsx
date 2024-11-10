@@ -28,30 +28,10 @@ export default function Home({ searchParams }: SearchParamProps) {
             height={100}
           />
           <PatientForm />
-          {/* <Button
-            variant={"ghost"}
-            onClick={async () => {
-              // const res = await account.createEmailToken(
-              //   ID.unique(),
-              //   "codeonlinesource@gmail.com" // redirect here on failure
-              // );
-              // const token = await account.createPhoneToken(
-              //   ID.unique(),
-              //   "+923362103259"
-              // );
-
-              // console.log(token, "res");
-            }}
-            className="w-full"
-          >
-            Sign With Google
-          </Button> */}
+           
 
           <div className="text-14-regular">
-            {/* <p className="justify-items-end text-dark-600 xl:text-left">
-              2024 I-Health
-            </p> */}
-
+            
             <div className="flex justify-start items-center text-xs">
               <span>Register As Admin ?</span>
               <Button variant={"link"}>

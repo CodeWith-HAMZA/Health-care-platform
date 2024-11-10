@@ -32,7 +32,7 @@ export async function createUser({
       name
     );
     await users.createSession(newuser.$id);
-    // const u = await account.create(ID.unique(), email, password, name);
+    const u = await account.create(ID.unique(), email, password, name);
     // await account.createEmailPasswordSession(email, password);
     // await account.createPhoneVerification();
 
